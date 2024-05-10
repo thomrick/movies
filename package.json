@@ -1,0 +1,22 @@
+{
+  "name": "movies",
+  "version": "0.0.1",
+  "description": "Movies game",
+  "author": "ThomRick",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "apps/*"
+    ]
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "volta": {
+    "node": "20.9.0",
+    "yarn": "1.22.19"
+  }
+}
