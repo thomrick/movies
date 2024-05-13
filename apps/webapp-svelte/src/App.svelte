@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
+  import { getGamePhase, getGamePreviousMovie } from "./lib/api.client";
 
   const hostname = import.meta.env.VITE_HOSTNAME || "https://movies.moum.it";
 
@@ -26,10 +27,7 @@
   });
 
   const handleRefreshPhase = async () => {
-    const res = await fetch(`${hostname}/game/phase`, {
-      credentials: "include",
-    });
-    game = await res.json();
+    game = await getGamePhase();
 
     setTimeout(handleRefreshPhase, game?.durationToNextPhase);
 
@@ -39,10 +37,7 @@
   };
 
   const handleRefreshResponse = async () => {
-    const res = await fetch(`${hostname}/game/previous-movie`, {
-      credentials: "include",
-    });
-    previous = await res.json();
+    previous = await getGamePreviousMovie();
   };
 
   const handleSubmit = async (event: SubmitEvent) => {
@@ -67,7 +62,11 @@
             />
           {:else if game?.phase === "MOVIE_PHASE"}
             <!-- svelte-ignore a11y-media-has-caption -->
-            <video in:fade={{ duration: 1000 }} src={`${hostname}/game/current-movie`} autoplay />
+            <video
+              in:fade={{ duration: 1000 }}
+              src={`${hostname}/game/current-movie`}
+              autoplay
+            />
           {/if}
         </div>
         <div class="tv-controls">
