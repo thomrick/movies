@@ -1,10 +1,10 @@
 const hostname = import.meta.env.VITE_HOSTNAME || "https://movies.moum.it";
 
-interface PostGameAnswerRequestPayload {
+export interface PostGameAnswerRequestPayload {
   title: string;
 }
 
-interface PostGameAnswerResponsePayload {
+export interface PostGameAnswerResponsePayload {
   message: string;
 }
 
@@ -27,7 +27,7 @@ export const getGameCurrentMovie = (): string => {
   return `${hostname}/game/current-movie`;
 };
 
-interface GetGamePhaseResponsePayload {
+export interface GetGamePhaseResponsePayload {
   phase: "PAUSE_PHASE" | "MOVIE_PHASE" | "END_PHASE";
   durationFromStart: number;
   durationToNextPhase: number;
@@ -41,7 +41,7 @@ export const getGamePhase = async (): Promise<GetGamePhaseResponsePayload> => {
   return await response.json();
 };
 
-interface GetGamePreviousMovieResponsePayload {
+export interface GetGamePreviousMovieResponsePayload {
   title: string;
   frenchTitle: string;
   posterUrl: string;
@@ -49,12 +49,12 @@ interface GetGamePreviousMovieResponsePayload {
 
 export const getGamePreviousMovie =
   async (): Promise<GetGamePreviousMovieResponsePayload> => {
-    const response = await fetch(`${hostname}/game/previous`);
+    const response = await fetch(`${hostname}/game/previous-movie`);
 
     return await response.json();
   };
 
-interface GamePlayerScoreboard {
+export interface GamePlayerScoreboard {
   answered: boolean;
   bonus: boolean;
   name: string;
@@ -63,7 +63,7 @@ interface GamePlayerScoreboard {
   totalWin: number;
 }
 
-interface GetGamePlayersResponsePayload extends Array<GamePlayerScoreboard> {}
+export interface GetGamePlayersResponsePayload extends Array<GamePlayerScoreboard> {}
 
 export const getGamePlayers =
   async (): Promise<GetGamePlayersResponsePayload> => {
@@ -72,11 +72,11 @@ export const getGamePlayers =
     return await response.json();
   };
 
-interface PostLoginRequestPayload {
+export interface PostLoginRequestPayload {
   username: string;
 }
 
-interface PostLoginResponsePayload {
+export interface PostLoginResponsePayload {
   message: string;
 }
 
