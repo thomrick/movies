@@ -67,7 +67,8 @@ export interface GamePlayerScoreboard {
   totalWin: number;
 }
 
-export interface GetGamePlayersResponsePayload extends Array<GamePlayerScoreboard> {}
+export interface GetGamePlayersResponsePayload
+  extends Array<GamePlayerScoreboard> {}
 
 export const getGamePlayers =
   async (): Promise<GetGamePlayersResponsePayload> => {
@@ -75,7 +76,9 @@ export const getGamePlayers =
       credentials: "include",
     });
 
-    return await response.json();
+    const players: GetGamePlayersResponsePayload = await response.json();
+
+    return players.sort((a, b) => a.rank - b.rank);
   };
 
 export interface PostLoginRequestPayload {
