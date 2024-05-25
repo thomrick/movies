@@ -36,7 +36,9 @@ export interface GetGamePhaseResponsePayload {
 }
 
 export const getGamePhase = async (): Promise<GetGamePhaseResponsePayload> => {
-  const response = await fetch(`${hostname}/game/phase`);
+  const response = await fetch(`${hostname}/game/phase`, {
+    credentials: "include",
+  });
 
   return await response.json();
 };
@@ -49,7 +51,9 @@ export interface GetGamePreviousMovieResponsePayload {
 
 export const getGamePreviousMovie =
   async (): Promise<GetGamePreviousMovieResponsePayload> => {
-    const response = await fetch(`${hostname}/game/previous-movie`);
+    const response = await fetch(`${hostname}/game/previous-movie`, {
+      credentials: "include",
+    });
 
     return await response.json();
   };
@@ -67,7 +71,9 @@ export interface GetGamePlayersResponsePayload extends Array<GamePlayerScoreboar
 
 export const getGamePlayers =
   async (): Promise<GetGamePlayersResponsePayload> => {
-    const response = await fetch(`${hostname}/game/players`);
+    const response = await fetch(`${hostname}/game/players`, {
+      credentials: "include",
+    });
 
     return await response.json();
   };
@@ -84,6 +90,7 @@ export const postLogin = async (
   payload: PostLoginRequestPayload
 ): Promise<PostLoginResponsePayload> => {
   const response = await fetch(`${hostname}/login`, {
+    credentials: "include",
     method: "POST",
     headers: {
       "Content-Type": "application/json",

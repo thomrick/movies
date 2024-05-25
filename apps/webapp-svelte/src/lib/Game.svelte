@@ -6,11 +6,13 @@
     getGamePhase,
     getGamePlayers,
     getGamePreviousMovie,
+    postGameAnswer,
     type GetGamePhaseResponsePayload,
     type GetGamePlayersResponsePayload,
     type GetGamePreviousMovieResponsePayload,
   } from "./api.client";
   import type { AuthenticationContext } from "./AuthenticationProvider.svelte";
+  import Button from "./components/Button.svelte";
 
   interface Game extends GetGamePhaseResponsePayload {}
 
@@ -26,13 +28,11 @@
   let scoreboard: Scoreboard = [];
   let switcher = false;
   let videoRef: HTMLVideoElement | undefined = undefined;
-
-  let timer: NodeJS.Timeout | undefined = undefined;
+  let userInput = "";
 
   onMount(() => {
     authentication.subscribe(({ authenticated }) => {
       if (!authenticated) {
-        // clearTimeout(timer);
         return;
       }
 
@@ -44,11 +44,14 @@
   const handleRefreshPhase = async () => {
     game = await getGamePhase();
 
-    setTimeout(handleRefreshPhase, game?.durationToNextPhase);
-
     if (game?.phase === "PAUSE_PHASE") {
+      userInput = "";
       await Promise.all([handleRefreshResponse(), handleRefreshScoreboard()]);
     }
+
+    return setTimeout(async () => {
+      await handleRefreshPhase()
+    }, game?.durationToNextPhase);
   };
 
   const handleRefreshResponse = async () => {
@@ -62,7 +65,8 @@
 
   const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
-    console.log("TRT", "handleSubmit");
+    const result = await postGameAnswer({ title: userInput });
+    userInput = "";
   };
 
   const handleSwithOn = () => {
@@ -121,17 +125,19 @@
       <form class="form" on:submit={handleSubmit}>
         <div class="field">
           <input
+            bind:value={userInput}
             disabled={!$authentication.authenticated ||
               game?.phase !== "MOVIE_PHASE"}
             class="text-field"
             type="text"
           />
-          <button
+          <Button
             disabled={!$authentication.authenticated ||
               game?.phase !== "MOVIE_PHASE"}
-            class="button"
-            type="submit">Submit</button
+            type="submit"
           >
+            Submit
+          </Button>
         </div>
       </form>
     </div>
@@ -139,7 +145,7 @@
   <div class="panel">
     <div class="panel-content no-space-bottom">
       {#if !$authentication.authenticated}
-        <button class="button" on:click={join}>Join</button>
+        <Button on:click={join}>Join</Button>
       {:else}
         <table class="table">
           <thead>
@@ -299,21 +305,6 @@
     cursor: text;
   }
   .text-field:disabled {
-    opacity: 0.6;
-    cursor: default;
-  }
-
-  .button {
-    all: unset;
-    height: 48px;
-    padding-inline: 16px;
-    background-color: var(--color-dark-a);
-    border-radius: 4px;
-    color: var(--color-dark-c);
-    font-weight: bold;
-    cursor: pointer;
-  }
-  .button:disabled {
     opacity: 0.6;
     cursor: default;
   }

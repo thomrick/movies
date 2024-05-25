@@ -10,6 +10,7 @@
   import { getGamePlayers, postLogin } from "./api.client";
   import appStore, { type Authentication } from "./app.store";
   import { writable, type Writable } from "svelte/store";
+  import Button from "./components/Button.svelte";
 
   const { data: app, cleanup, register } = appStore;
 
@@ -71,9 +72,75 @@
   <p>Something went wrong</p>
 {/await}
 
-<dialog bind:this={modalRef}>
-  <h1>Welcome to movies!</h1>
-  <p>Please enter your name:</p>
-  <input type="text" bind:value={username} />
-  <button on:click={handleSignIn}>Submit</button>
+<dialog class="modal" bind:this={modalRef}>
+  <div class="modal-header">
+    <h1>Welcome to movies!</h1>
+  </div>
+  <div class="modal-content">
+    <p class="paragraph">Please enter your name:</p>
+    <input class="text-field" type="text" bind:value={username} />
+  </div>
+  <div class="modal-footer">
+    <Button variant="ghost" on:click={handleSignIn}>Submit</Button>
+  </div>
 </dialog>
+
+<style>
+  .modal[open] {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    background-color: var(--color-dark-a);
+    color: var(--color-dark-c);
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 24px;
+  }
+
+  .modal[open]::backdrop {
+    background-color: var(--color-dark-a);
+    opacity: 0.5;
+  }
+
+  .modal-header {
+    width: 100%;
+  }
+
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    position: relative;
+  }
+
+  .modal-footer {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .paragraph {
+    margin-bottom: 24px;
+  }
+
+  .text-field {
+    all: unset;
+    box-sizing: border-box;
+    width: 100%;
+    height: 48px;
+    padding-inline: 16px;
+    background-color: var(--color-dark-a);
+    border-radius: 4px;
+    color: var(--color-dark-c);
+    cursor: text;
+    border: 1px solid var(--color-dark-c);
+  }
+  .text-field:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+</style>
