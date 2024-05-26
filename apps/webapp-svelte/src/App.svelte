@@ -2,13 +2,12 @@
   import { onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
   import { getGameCurrentMovie, postGameAnswer } from "./lib/api.client";
-  import Button from "./lib/components/Button.svelte";
   import {
-    store as authentication,
+    authentication,
     login,
     logout,
-  } from "./lib/stores/authentication.store";
-  import { store as game, start, stop } from "./lib/stores/game.store";
+  } from "./lib/authentication.store";
+  import { game, players, previousMovie, start, stop } from "./lib/game.store";
 
   let videoRef: HTMLVideoElement | undefined = undefined;
   let modalRef: HTMLDialogElement;
@@ -24,10 +23,10 @@
 
       if (authenticated) {
         await start();
-        unsubscribe = game.subscribe(({ scoreboard }) => {
+        unsubscribe = players.subscribe((registeredPlayers) => {
           if (
-            scoreboard.length === 0 ||
-            !scoreboard.some((p) => p.name === username)
+            registeredPlayers.length === 0 ||
+            !registeredPlayers.some((p) => p.name === username)
           ) {
             logout();
             switcher = false;
@@ -83,15 +82,15 @@
             />
           {:else if !switcher}
             <div class="noise-effect switch-off" />
-          {:else if $game.game?.phase === "PAUSE_PHASE"}
+          {:else if $game?.phase === "PAUSE_PHASE"}
             <img
               class="tv-video"
-              class:on={$game.game?.phase === "PAUSE_PHASE"}
+              class:on={$game?.phase === "PAUSE_PHASE"}
               in:fly={{ y: 200, delay: 500, duration: 2000 }}
-              src={$game.previousMovie?.posterUrl}
-              alt={$game.previousMovie?.title}
+              src={$previousMovie?.posterUrl}
+              alt={$previousMovie?.title}
             />
-          {:else if $game.game?.phase === "MOVIE_PHASE"}
+          {:else if $game?.phase === "MOVIE_PHASE"}
             <!-- svelte-ignore a11y-media-has-caption -->
             <video
               bind:this={videoRef}
@@ -114,17 +113,18 @@
           <input
             bind:value={userInput}
             disabled={!$authentication.authenticated ||
-              $game.game?.phase !== "MOVIE_PHASE"}
+              $game?.phase !== "MOVIE_PHASE"}
             class="text-field"
             type="text"
           />
-          <Button
+          <button
+            class="button"
             disabled={!$authentication.authenticated ||
-              $game.game?.phase !== "MOVIE_PHASE"}
+              $game?.phase !== "MOVIE_PHASE"}
             type="submit"
           >
             Submit
-          </Button>
+          </button>
         </div>
       </form>
     </div>
@@ -132,7 +132,7 @@
   <div class="panel">
     <div class="panel-content no-space-bottom">
       {#if !$authentication.authenticated}
-        <Button on:click={handleJoin}>Join</Button>
+        <button type="button" class="button" on:click={handleJoin}>Join</button>
       {:else}
         <table class="table">
           <thead>
@@ -142,7 +142,7 @@
             </tr>
           </thead>
           <tbody>
-            {#each $game.scoreboard as player}
+            {#each $players as player}
               <tr>
                 <td>{player.name}</td>
                 <td>{player.score}</td>
@@ -164,7 +164,7 @@
     <input class="text-field" type="text" bind:value={username} />
   </div>
   <div class="modal-footer">
-    <Button variant="ghost" on:click={handleSignIn}>Submit</Button>
+    <button class="button" type="button" on:click={handleSignIn}>Submit</button>
   </div>
 </dialog>
 
@@ -195,13 +195,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: var(--color-dark-b);
+    background-color: var(--color-dark-a);
     color: var(--color-dark-a);
     padding: 24px;
     margin-bottom: 24px;
     border-radius: 8px;
-    box-shadow: 3px 3px 10px -3px rgba(245, 216, 131, 0.3);
-    opacity: 0.9;
+    border: 1px solid var(--color-dark-c);
   }
 
   .panel-content {
@@ -314,7 +313,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    border: 1px solid var(--color-dark-d);
+    border: 1px solid var(--color-dark-c);
     border-radius: 8px;
     overflow: hidden;
   }
@@ -335,7 +334,7 @@
   }
 
   .table > :not(:last-child) {
-    border-bottom: 1px solid var(--color-dark-d);
+    border-bottom: 1px solid var(--color-dark-c);
   }
 
   .table th {
@@ -344,11 +343,11 @@
     display: flex;
     align-items: center;
     padding-inline: 24px;
-    background-color: var(--color-dark-d);
+    background-color: var(--color-dark-c);
   }
 
   .table tbody > :not(:last-child) {
-    border-bottom: 1px solid var(--color-dark-d);
+    border-bottom: 1px solid var(--color-dark-c);
   }
 
   .table td {
@@ -356,6 +355,7 @@
     display: flex;
     align-items: center;
     padding-inline: 24px;
+    color: var(--color-dark-c)
   }
 
   .modal[open] {
@@ -412,6 +412,29 @@
     border: 1px solid var(--color-dark-c);
   }
   .text-field:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .button {
+    all: unset;
+    box-sizing: border-box;
+    height: 46px;
+    padding-inline: 16px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    background-color: inherit;
+    border-color: var(--color-dark-c);
+    color: var(--color-dark-c);
+  }
+  .button:not(:disabled):hover {
+    background-color: var(--color-dark-c);
+    color: var(--color-dark-a);
+  }
+  .button:disabled {
     opacity: 0.6;
     cursor: default;
   }

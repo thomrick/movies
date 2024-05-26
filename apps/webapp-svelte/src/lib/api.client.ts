@@ -28,7 +28,7 @@ export const getGameCurrentMovie = (): string => {
 };
 
 export interface GetGamePhaseResponsePayload {
-  phase: "PAUSE_PHASE" | "MOVIE_PHASE" | "END_PHASE";
+  phase: "PAUSE_PHASE" | "MOVIE_PHASE" | "END_PHASE" | "INIT_PHASE";
   durationFromStart: number;
   durationToNextPhase: number;
   phaseNumber: number;
