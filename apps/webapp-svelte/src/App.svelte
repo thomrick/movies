@@ -2,19 +2,22 @@
   import { onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
   import { getGameCurrentMovie } from "./lib/api.client";
+  import { authentication, login, logout } from "./lib/authentication.store";
   import {
-    authentication,
-    login,
-    logout,
-  } from "./lib/authentication.store";
-  import { game, guess, players, previousMovie, start, stop } from "./lib/game.store";
+    game,
+    guess,
+    players,
+    previousMovie,
+    start,
+    stop,
+  } from "./lib/game.store";
 
   let userInputRef: HTMLInputElement;
   let modalRef: HTMLDialogElement;
   let videoRef: HTMLVideoElement | undefined = undefined;
-  
+
   let switcher = false;
-  
+
   let userInput = "";
   let username = "";
 
@@ -48,7 +51,7 @@
 
   const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
-    console.log('TRT', await guess(userInput));
+    console.log("TRT", await guess(userInput));
     userInput = "";
   };
 
@@ -110,8 +113,13 @@
           {/if}
         </div>
         <div class="tv-controls">
-          <button on:click={handleSwithOn}>On</button>
-          <button on:click={handleSwitchOff}>Off</button>
+          <div class="channel">
+            <!-- {`${$game?.phaseNumber}`} -->
+          </div>
+          <div class="switchers">
+            <button class="switch on" class:switched={switcher} on:click={handleSwithOn}>On</button>
+            <button class="switch off" class:switched={!switcher} on:click={handleSwitchOff}>Off</button>
+          </div>
         </div>
       </div>
     </div>
@@ -237,13 +245,52 @@
   .tv-controls {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: space-between;
     width: 100%;
     max-width: 150px;
     background-color: var(--color-dark-a);
     border-radius: 25px;
     padding: 12px;
     border: 10px solid gray;
+  }
+
+  .tv-controls > .channel {
+    color: var(--color-dark-c);
+  }
+
+  .tv-controls > .switchers {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tv-controls > .switchers > .switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    text-decoration: none;
+    color: var(--color-dark-a);
+    font-size: 18px;
+    border-radius: 4px;
+    width: 100%;
+    height: 40px;
+    font-weight: bold;
+    border: 2px solid var(--color-dark-a);
+    transition: 0.3s;
+    cursor: pointer;
+  }
+  .tv-controls > .switchers > .switch.on {
+    background-color: #448D3C;
+    box-shadow: 0px 6px 0px -2px #448D3C;
+  }
+  .tv-controls > .switchers > .switch.off {
+    background-color: #DE2D2D;
+    box-shadow: 0px 6px 0px -2px #DE2D2D;
+  }
+  .tv-controls > .switchers > .switch.switched {
+    box-shadow: 0 0 #fff;
+    transform: translateY(1px);
   }
 
   .tv-screen {
@@ -364,7 +411,7 @@
     display: flex;
     align-items: center;
     padding-inline: 24px;
-    color: var(--color-dark-c)
+    color: var(--color-dark-c);
   }
 
   .modal[open] {
