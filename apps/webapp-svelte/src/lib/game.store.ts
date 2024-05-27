@@ -3,6 +3,7 @@ import {
   getGamePhase,
   getGamePlayers,
   getGamePreviousMovie,
+  postGameAnswer,
   type GetGamePhaseResponsePayload,
   type GetGamePlayersResponsePayload,
   type GetGamePreviousMovieResponsePayload,
@@ -75,5 +76,10 @@ const stop = () => {
   unsubscribe();
 };
 
-export { game, players, previousMovie, start, stop };
+const guess = async (value: string) => {
+  const { message } = await postGameAnswer({ title: value });
+  getGamePlayers().then(players.set);
+  return message;
+};
 
+export { game, guess, players, previousMovie, start, stop };

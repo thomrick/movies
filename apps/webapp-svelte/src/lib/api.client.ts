@@ -5,7 +5,7 @@ export interface PostGameAnswerRequestPayload {
 }
 
 export interface PostGameAnswerResponsePayload {
-  message: string;
+  message: 'ok' | 'ko';
 }
 
 export const postGameAnswer = async (

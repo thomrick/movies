@@ -1,16 +1,17 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
-  import { getGameCurrentMovie, postGameAnswer } from "./lib/api.client";
+  import { getGameCurrentMovie } from "./lib/api.client";
   import {
     authentication,
     login,
     logout,
   } from "./lib/authentication.store";
-  import { game, players, previousMovie, start, stop } from "./lib/game.store";
+  import { game, guess, players, previousMovie, start, stop } from "./lib/game.store";
 
-  let videoRef: HTMLVideoElement | undefined = undefined;
+  let userInputRef: HTMLInputElement;
   let modalRef: HTMLDialogElement;
+  let videoRef: HTMLVideoElement | undefined = undefined;
   
   let switcher = false;
   
@@ -37,16 +38,23 @@
         unsubscribe();
       }
     });
+
+    game.subscribe((value) => {
+      if (switcher && value?.phase === "MOVIE_PHASE") {
+        userInputRef?.focus();
+      }
+    });
   });
 
   const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
-    const result = await postGameAnswer({ title: userInput });
+    console.log('TRT', await guess(userInput));
     userInput = "";
   };
 
   const handleSwithOn = () => {
     switcher = true;
+    userInputRef?.focus();
     videoRef?.play();
   };
 
@@ -111,6 +119,7 @@
       <form class="form" on:submit={handleSubmit}>
         <div class="field">
           <input
+            bind:this={userInputRef}
             bind:value={userInput}
             disabled={!$authentication.authenticated ||
               $game?.phase !== "MOVIE_PHASE"}
