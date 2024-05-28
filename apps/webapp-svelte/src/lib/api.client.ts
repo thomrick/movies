@@ -78,7 +78,7 @@ export const getGamePlayers =
 
     const players: GetGamePlayersResponsePayload = await response.json();
 
-    return players.sort((a, b) => a.rank - b.rank);
+    return [...players].sort((a, b) => b.rank - a.rank);
   };
 
 export interface PostLoginRequestPayload {

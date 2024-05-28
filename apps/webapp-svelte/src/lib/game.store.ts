@@ -1,4 +1,4 @@
-import { writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import {
   getGamePhase,
   getGamePlayers,
@@ -22,8 +22,8 @@ const jobId = writable<NodeJS.Timeout | undefined>(undefined);
 
 const refresh = async () => {
   const newGame = await getGamePhase();
-  game.set(newGame);
   jobId.set(setTimeout(refresh, newGame.durationToNextPhase));
+  game.set(newGame);
 
   switch (newGame.phase) {
     case "END_PHASE": {
@@ -41,6 +41,7 @@ const refresh = async () => {
       break;
     }
     case "MOVIE_PHASE": {
+      getGamePlayers().then(players.set);
       previousMovie.set(undefined);
       break;
     }

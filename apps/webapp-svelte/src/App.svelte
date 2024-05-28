@@ -89,7 +89,7 @@
     <div class="panel-content">
       <div class="tv">
         <div class="tv-screen">
-          {#if !$authentication.authenticated}
+          {#if !$authentication.authenticated || $game?.phase === "END_PHASE"}
             <img
               in:fade={{ duration: 1000 }}
               src="/mire-tdf.jpg"
@@ -111,7 +111,7 @@
               bind:this={videoRef}
               class="tv-video"
               in:fade={{ duration: 1000 }}
-              src={getGameCurrentMovie()}
+              src={`${getGameCurrentMovie()}?${$game?.phaseNumber}`}
               on:loadeddata={() => videoRef?.play()}
             />
           {/if}
@@ -174,8 +174,11 @@
             </tr>
           </thead>
           <tbody>
-            {#each $players as player}
-              <tr>
+            {#each $players as player (player.name)}
+              <tr
+                class:answered={$game?.phase !== "END_PHASE" && player.answered}
+                class:win={$game?.phase === "END_PHASE" && player.rank === 0}
+              >
                 <td>{player.name}</td>
                 <td>{player.score}</td>
               </tr>
@@ -439,7 +442,17 @@
     display: flex;
     align-items: center;
     padding-inline: 24px;
+  }
+
+  .table tbody tr {
     color: var(--color-dark-c);
+    transition: all 0.3s ease;
+  }
+
+  .table tbody tr.answered,
+  .table tbody tr.win {
+    color: var(--color-dark-a);
+    background-color: #448d3c;
   }
 
   .modal[open] {
