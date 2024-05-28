@@ -46,6 +46,10 @@
       if (switcher && value?.phase === "MOVIE_PHASE") {
         userInputRef?.focus();
       }
+
+      if (value?.phase === "PAUSE_PHASE") {
+        userInput = "";
+      }
     });
   });
 
@@ -113,12 +117,23 @@
           {/if}
         </div>
         <div class="tv-controls">
-          <div class="channel">
-            <!-- {`${$game?.phaseNumber}`} -->
+          <div class="tv-channel">
+            {`${$game?.phaseNumber ? $game.phaseNumber + 1 : 0}`}
+            {$game?.totalPhase ? `/ ${$game.totalPhase}` : ""}
           </div>
-          <div class="switchers">
-            <button class="switch on" class:switched={switcher} on:click={handleSwithOn}>On</button>
-            <button class="switch off" class:switched={!switcher} on:click={handleSwitchOff}>Off</button>
+          <div class="tv-switchers">
+            <button
+              class="tv-switch on"
+              class:switched={switcher}
+              disabled={!$authentication.authenticated}
+              on:click={handleSwithOn}>On</button
+            >
+            <button
+              class="tv-switch off"
+              class:switched={!switcher}
+              disabled={!$authentication.authenticated}
+              on:click={handleSwitchOff}>Off</button
+            >
           </div>
         </div>
       </div>
@@ -254,17 +269,26 @@
     border: 10px solid gray;
   }
 
-  .tv-controls > .channel {
-    color: var(--color-dark-c);
+  /** TV Channel styles */
+  .tv-channel {
+    color: var(--color-dark-b);
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 20px 0 5px;
+    align-items: flex-end;
+    font-size: 24px;
+    font-weight: bold;
   }
 
-  .tv-controls > .switchers {
+  /** TV Switchers */
+  .tv-switchers {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
 
-  .tv-controls > .switchers > .switch {
+  .tv-switch {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -280,15 +304,19 @@
     transition: 0.3s;
     cursor: pointer;
   }
-  .tv-controls > .switchers > .switch.on {
-    background-color: #448D3C;
-    box-shadow: 0px 6px 0px -2px #448D3C;
+  .tv-switch:disabled {
+    opacity: 0.6;
+    cursor: default;
   }
-  .tv-controls > .switchers > .switch.off {
-    background-color: #DE2D2D;
-    box-shadow: 0px 6px 0px -2px #DE2D2D;
+  .tv-switch.on {
+    background-color: #448d3c;
+    box-shadow: 0px 6px 0px -2px #448d3c;
   }
-  .tv-controls > .switchers > .switch.switched {
+  .tv-switch.off {
+    background-color: #de2d2d;
+    box-shadow: 0px 6px 0px -2px #de2d2d;
+  }
+  .tv-switch.switched {
     box-shadow: 0 0 #fff;
     transform: translateY(1px);
   }
